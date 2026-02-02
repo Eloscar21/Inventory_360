@@ -1,1 +1,26 @@
-#este archivo será el .env
+# --- CONFIGURACIÓN DEL SERVIDOR (BACKEND) ---
+PORT=3000
+NODE_ENV=development
+
+# --- CONEXIÓN A LA BASE DE DATOS (MARIADB) ---
+# Datos basados en tus scripts previos de gestión de BD
+DB_HOST=localhost
+DB_PORT=3306
+DB_USER=root
+DB_PASSWORD=tu_password_seguro
+DB_NAME=inventory_360_db
+
+# --- SEGURIDAD Y AUTENTICACIÓN (ÉPICA 3) ---
+# Necesario para el Middleware de sesiones y JWT
+JWT_SECRET=clave_secreta_para_desarrollo_123
+SESSION_SECRET=sesion_secreta_inv360
+
+# --- INTEGRACIÓN FRONTEND-BACKEND ---
+# URL que el Frontend usará para las peticiones AJAX/Fetch
+VITE_API_URL=http://localhost:3000/api
+# Origen permitido para CORS (Seguridad)
+CORS_ORIGIN=http://localhost:5173 
+
+# --- SERVICIOS DE IA (FASE FUTURA) ---
+# Espacio reservado para la integración con el motor de IA
+IA_SERVICE_KEY=proximamente_en_sprint_2
