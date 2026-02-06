@@ -1,0 +1,222 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Inventario - Inventory 360</title>
+    <!-- Use Google Fonts for premium feel -->
+    <link rel="stylesheet" href="../assets/estilos.css">
+</head>
+
+<body>
+    <div class="container">
+        <header class="section-header">
+            <h1>Gestión de Inventario</h1>
+            <p>Administra y controla todos los productos de tu inventario</p>
+        </header>
+
+        <div class="inventory-controls">
+            <input type="text" id="searchSKU" placeholder="Buscar por nombre o SKU...">
+            <select id="filterCategory">
+                <option value="">Todas las categorías</option>
+                <option value="electronica">Electrónica</option>
+                <option value="accesorios">Accesorios</option>
+            </select>
+            <select id="filterStatus">
+                <option value="">Todos los estados</option>
+                <option value="ok">Stock Normal</option>
+                <option value="low">Stock Bajo</option>
+                <option value="critical">Stock Crítico</option>
+            </select>
+            <button class="btn-primary" id="btnAgregar">
+                <span>+</span> Agregar Producto
+            </button>
+        </div>
+
+        <div class="table-container">
+            <table class="inventory-table">
+                <thead>
+                    <tr>
+                        <th>SKU</th>
+                        <th>Imagen</th>
+                        <th>Nombre del Producto</th>
+                        <th>Categoría</th>
+                        <th>Precio</th>
+                        <th>Stock</th>
+                        <th>Estado</th>
+                        <th>Acciones</th>
+                    </tr>
+                </thead>
+                <tbody id="inventoryBody">
+                    <tr>
+                        <td style="font-family: monospace; font-weight: 600;">MON-LG-27-004</td>
+                        <td>
+                            <!-- Placeholder image -->
+                            <div class="img-thumb"
+                                style="background-color: #cbd5e1; display:flex; align-items:center; justify-content:center; color:#64748b; font-size:10px;">
+                                IMG</div>
+                        </td>
+                        <td>Monitor LG 27" 4K</td>
+                        <td>Electrónica</td>
+                        <td>$450.00</td>
+                        <td>3 uds.</td>
+                        <td><span class="badge status-critical">Stock Crítico</span></td>
+                        <td>
+                            <button class="btn-icon btn-edit" title="Editar">✎</button>
+                            <button class="btn-icon btn-delete" title="Eliminar">🗑</button>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td style="font-family: monospace; font-weight: 600;">KEY-MEC-001</td>
+                        <td>
+                            <div class="img-thumb"
+                                style="background-color: #cbd5e1; display:flex; align-items:center; justify-content:center; color:#64748b; font-size:10px;">
+                                IMG</div>
+                        </td>
+                        <td>Teclado Mecánico RGB</td>
+                        <td>Accesorios</td>
+                        <td>$85.00</td>
+                        <td>120 uds.</td>
+                        <td><span class="badge status-ok">Stock Normal</span></td>
+                        <td>
+                            <button class="btn-icon btn-edit" title="Editar">✎</button>
+                            <button class="btn-icon btn-delete" title="Eliminar">🗑</button>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <!-- Modal para Agregar Producto -->
+        <div id="modalAgregarProducto" class="modal">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h2>Nuevo Producto</h2>
+                    <button class="close-modal" id="btnCerrarModal">&times;</button>
+                </div>
+
+                <form id="formAgregarProducto" class="validate-form" novalidate>
+                    <div class="form-group">
+                        <label for="inputSKU">SKU</label>
+                        <input type="text" id="inputSKU" name="sku" placeholder="Ej: ABC-123-000" required
+                            pattern="^[A-Z]{3}-\d{3}-\d{3}$" title="Formato: AAA-000-000">
+                    </div>
+
+                    <div class="form-group">
+                        <label for="inputNombre">Nombre del Producto</label>
+                        <input type="text" id="inputNombre" name="nombre" placeholder="Nombre descriptivo" required
+                            minlength="3">
+                    </div>
+
+                    <div class="form-group">
+                        <label for="inputPrecio">Precio ($)</label>
+                        <input type="number" id="inputPrecio" name="precio" placeholder="0.00" step="0.01" min="0"
+                            required>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="inputStock">Stock Inicial</label>
+                        <input type="number" id="inputStock" name="stock" placeholder="0" min="0" required>
+                    </div>
+
+                    <div class="modal-actions">
+                        <button type="button" class="btn-secondary" id="btnCancelar">Cancelar</button>
+                        <button type="submit" class="btn-primary" id="btnGuardar">Guardar Producto</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- Script de Validaciones -->
+    <script src="../js/validation.js"></script>
+
+    <!-- Script simple para manejar el modal y añadir filas dummy -->
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const modal = document.getElementById('modalAgregarProducto');
+            const btnAgregar = document.getElementById('btnAgregar');
+            const btnCerrar = document.getElementById('btnCerrarModal');
+            const btnCancelar = document.getElementById('btnCancelar');
+            const form = document.getElementById('formAgregarProducto');
+
+            // Abrir modal
+            btnAgregar.addEventListener('click', () => {
+                modal.classList.add('show');
+            });
+
+            // Cerrar modal
+            const cerrarModal = () => {
+                modal.classList.remove('show');
+                form.reset();
+                // Limpiar errores visuales del script de validación (si es necesario)
+                form.querySelectorAll('.invalid').forEach(el => el.classList.remove('invalid'));
+                form.querySelectorAll('.error-message').forEach(el => el.textContent = '');
+            };
+
+            btnCerrar.addEventListener('click', cerrarModal);
+            btnCancelar.addEventListener('click', cerrarModal);
+
+            // Cerrar al hacer click fuera
+            window.addEventListener('click', (e) => {
+                if (e.target === modal) {
+                    cerrarModal();
+                }
+            });
+
+            // Handle Submit (Simulado)
+            form.addEventListener('submit', (e) => {
+                // La validación se maneja en validation.js. 
+                // Si llega aquí, es porque es válido (si validation.js hace preventDefault correctamente).
+                // NOTA: validation.js usa e.preventDefault() si es invalido. 
+                // Necesitamos saber si fue validado.
+
+                // Podemos reutilizar la función global siValidation.validateForm es accesible, 
+                // o confiar en que validation.js bloquea el evento si falla.
+                // Como validation.js se ejecuta *antes* que este listener si se añadió primero (o por burbujeo),
+                // asumiremos validación exitosa si validation.js no detuvo la propagación inmediata 
+                // (pero validation.js solo hace preventDefault, no stopImmediatePropagation).
+
+                // Una forma más robusta es chequear manualmente aquí también o ver si hay clases de error.
+                if (Validation.validateForm(form)) {
+                    e.preventDefault(); // Prevenir envio real por ahora
+
+                    alert('Producto guardado correctamente (Simulación)');
+
+                    // Aquí iría la lógica para agregar a la tabla
+                    const sku = document.getElementById('inputSKU').value;
+                    const nombre = document.getElementById('inputNombre').value;
+                    const precio = document.getElementById('inputPrecio').value;
+                    const stock = document.getElementById('inputStock').value;
+
+                    const tbody = document.getElementById('inventoryBody');
+                    const row = document.createElement('tr');
+
+                    let statusBadge = '<span class="badge status-ok">Stock Normal</span>';
+                    if (stock < 5) statusBadge = '<span class="badge status-critical">Stock Crítico</span>';
+                    else if (stock < 15) statusBadge = '<span class="badge status-low">Stock Bajo</span>';
+
+                    row.innerHTML = `
+                        <td style="font-family: monospace; font-weight: 600;">${sku}</td>
+                        <td><div class="img-thumb" style="background-color: #cbd5e1; display:flex; align-items:center; justify-content:center; color:#64748b; font-size:10px;">IMG</div></td>
+                        <td>${nombre}</td>
+                        <td>Generico</td>
+                        <td>$${parseFloat(precio).toFixed(2)}</td>
+                        <td>${stock} uds.</td>
+                        <td>${statusBadge}</td>
+                        <td>
+                            <button class="btn-icon btn-edit" title="Editar">✎</button> 
+                            <button class="btn-icon btn-delete" title="Eliminar">🗑</button>
+                        </td>
+                    `;
+                    tbody.appendChild(row);
+
+                    cerrarModal();
+                }
+            });
+        });
+    </script>
+</body>
+
+</html>
